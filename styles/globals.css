@@ -1,0 +1,22 @@
+
+@import 'slick-carousel/slick/slick.css';
+@import 'slick-carousel/slick/slick-theme.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Transição para quando a imagem for aberta */
+.transition-transform {
+  transition: transform 0.3s ease-in-out;
+}
+
+.scale-100 {
+  transform: scale(1);
+}
+
+.scale-110 {
+  transform: scale(1.1); /* Ou qualquer valor que queira para a ampliação */
+}
+
+
