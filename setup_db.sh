@@ -3,8 +3,9 @@
 # Defina as variáveis
 CONTAINER_NAME="my_postgres"
 DB_USER="test"
-DB_PASS="teste123"
-DB_NAME="memory"
+DB_PASS="test123"
+DB_NAME="memory_lane" 
+DB_PORT="5436"  # Porta exposta pelo Docker (5436)
 MIGRATION_FILE="migration-create-memory-table.sql"
 MIGRATION_PATH="./migrations/migration-create-memory-table.sql"
 
@@ -35,16 +36,20 @@ if ! docker ps | grep -q "$CONTAINER_NAME"; then
   exit 1
 fi
 
+# Criar o banco de dados caso não exista
+echo "Verificando e criando o banco de dados, se necessário..."
+docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -p "$DB_PORT" -c "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
+
 # Copiar o arquivo de migration para dentro do contêiner
 echo "Copiando o arquivo de migration para o contêiner..."
 docker cp "$MIGRATION_PATH" "$CONTAINER_NAME:/migration-create-memory-table.sql"
 
 # Executar o script de migration dentro do contêiner
 echo "Executando a migration para criar a tabela 'memory'..."
-docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -d "$DB_NAME" -f /migration-create-memory-table.sql
+docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -p "$DB_PORT" -d "$DB_NAME" -f /migration-create-memory-table.sql
 
 # Confirmar se a tabela foi criada
 echo "Verificando se a tabela 'memory' foi criada..."
-docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -d "$DB_NAME" -c "SELECT * FROM memory LIMIT 1;"
+docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -p "$DB_PORT" -d "$DB_NAME" -c "SELECT * FROM memory LIMIT 1;"
 
 echo "Setup do banco de dados concluído com sucesso!"
